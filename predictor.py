@@ -1,6 +1,9 @@
 import sys
 import pickle
 import numpy as np
+from datetime import datetime
+
+min_dt = datetime(2020, 1, 1)
 
 def predict_reg(input: list):
     """
@@ -14,6 +17,9 @@ def predict_reg(input: list):
     return reg_model.predict(input)
 
 if __name__ == "__main__":
-    args = [float(arg) for arg in sys.argv[1:]]
-    result = predict_reg(args)
+    dt = sys.argv[1].split("-")
+    dt = datetime(int(dt[0]), int(dt[1]), int(dt[2]))
+    x = (dt.timestamp() - min_dt.timestamp()) / 86400
+
+    result = predict_reg([x])
     print(result)

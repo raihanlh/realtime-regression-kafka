@@ -15,7 +15,7 @@ python trainer.py
 
 2. In terminal #3, run predictor
 ```
-python predictor.py <args separated by space>
+python predictor.py <date>
 
-example: python predictor.py 10 20 30
+example: python predictor.py 2020-01-20
 ```

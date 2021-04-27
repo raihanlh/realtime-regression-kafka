@@ -1,6 +1,9 @@
 from time import sleep
 from kafka import KafkaProducer
 import random
+import pandas as pd
+import numpy as np
+from datetime import datetime
 
 producer = KafkaProducer(bootstrap_servers=['localhost:9092'],
                          value_serializer=lambda x:
@@ -8,6 +11,7 @@ producer = KafkaProducer(bootstrap_servers=['localhost:9092'],
 
 message = ""
 x = 1
+min_dt = datetime(2020, 1, 1)
 
 def reg(x):
     """
@@ -27,12 +31,22 @@ def append_msg(msg, x, y):
     :param  y:      input float
     :return:        appended msg with x and y
     """
-    return (msg + ";" + str(x) + " " + str(y) if msg != "a" else str(x) + " " + str(y))
+    return (msg + ";" + str(x) + " " + str(y) if msg != "" else str(x) + " " + str(y))
 
-while True:
-    y = reg(x)
-    message = append_msg(message, x, y)
-    producer.send('regression', value=message)
-    sleep(5)
-    x = x+1
+if __name__ == "__main__":
+    df = pd.read_csv("BTC-USD.csv")
 
+    i = 0
+
+    for j in range(len(df)):
+        dt = df.loc[i]["Date"]
+        dt = dt.split('-')
+        dt = datetime(int(dt[0]), int(dt[1]), int(dt[2]))
+
+        x = (dt.timestamp() - min_dt.timestamp()) / 86400
+        y = df.loc[i]["Adj Close"]
+        message = append_msg(message, x, y)
+        print(message)
+        producer.send('regression', value=message)
+        sleep(3)
+        i += 1
